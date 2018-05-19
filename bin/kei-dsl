@@ -70,9 +70,6 @@ CONFIG_FILE="$1"
 CONFIG_DIRNAME=$(dirname "${CONFIG_FILE}")
 CONFIG_BASENAME=$(basename "${CONFIG_FILE}")
 
-USER=$(quote $(stat -c '%U' "${CONFIG_FILE}"))
-
-echo "-runas ${USER}"
 echo "-monitor unix:monitor.sock,server,nowait"
 echo "-enable-kvm -vga std -nographic -vnc none"
 
