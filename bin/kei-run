@@ -9,7 +9,7 @@ KEI_DSL=$(which kei-dsl)
 CONFIG_FILE="$1"
 CONFIG_DIRNAME=$(dirname "${CONFIG_FILE}")
 
-QEMU_OPTS=$("${KEI_DSL}" "${CONFIG_BASENAME}")
+QEMU_OPTS=$("${KEI_DSL}" "${CONFIG_FILE}")
 echo "$QEMU_OPTS"
 {
     cd "$CONFIG_DIRNAME"
