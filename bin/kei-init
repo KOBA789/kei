@@ -23,6 +23,3 @@ hdd "disks/001.img" 20G
 #pxe
 boot
 EOF
-cdrom ".iso"
-boot
-EOF
