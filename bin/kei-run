@@ -6,10 +6,9 @@ QEMU=${QEMU:-$(which qemu-system-x86_64)}
 
 KEI_DSL=$(which kei-dsl)
 
-CONFIG_FILE="$1"
-CONFIG_DIRNAME=$(dirname "${CONFIG_FILE}")
+CONFIG_DIRNAME="$1"
 
-QEMU_OPTS=$("${KEI_DSL}" "${CONFIG_FILE}")
+QEMU_OPTS=$("${KEI_DSL}" "${CONFIG_DIRNAME}/config")
 echo "$QEMU_OPTS"
 {
     cd "$CONFIG_DIRNAME"
