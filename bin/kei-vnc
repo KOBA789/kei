@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -Cue
+
+CONFIG_DIR="$1"
+
+echo "Set VNC password:"
+read -s VNC_PASSWORD
+
+function reset_vnc() {
+    socat - "UNIX-CONNECT:$CONFIG_DIR/monitor.sock" > /dev/null <<EOF
+change vnc none
+EOF
+}
+
+socat - "UNIX-CONNECT:$CONFIG_DIR/monitor.sock" > /dev/null <<EOF
+change vnc :0,password
+change vnc password
+$VNC_PASSWORD
+EOF
+
+trap reset_vnc 1 2 3 15
+
+echo "Ctrl-C to shutdown VNC"
+tail -f /dev/null
