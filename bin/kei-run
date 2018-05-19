@@ -13,9 +13,5 @@ QEMU_OPTS=$("${KEI_DSL}" "${CONFIG_FILE}")
 echo "$QEMU_OPTS"
 {
     cd "$CONFIG_DIRNAME"
-    if [ "$(id -u)" = 1 ]; then
-        $QEMU $QEMU_OPTS
-    else
-        sudo $QEMU $QEMU_OPTS
-    fi
+    $QEMU $QEMU_OPTS
 }
