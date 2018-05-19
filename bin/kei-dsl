@@ -1,0 +1,80 @@
+#!/bin/bash
+
+set -Cue
+
+# quote <RAW>
+function quote() {
+    printf %q "$1"
+}
+
+BRIDGE_HELPER=$(quote '/usr/lib/qemu/qemu-bridge-helper')
+
+# boot
+BOOT_ORDER=""
+function boot() {
+    BOOT_ORDER=${BOOT_ORDER:-c}
+    echo "-boot ${BOOT_ORDER}"
+}
+function __append_boot_device() {
+    local DEVICE="$1"
+    if ! echo -n "${BOOT_ORDER}" | grep "${DEVICE}" > /dev/null; then
+        BOOT_ORDER="${BOOT_ORDER}${DEVICE}"
+    fi
+}
+
+# pxe
+function pxe() {
+    __append_boot_device n
+}
+
+# nic <NETDEV_ID> <BRIDGE>
+function nic() {
+    local NETDEV_ID=$(quote "$1")
+    local BRIDGE=$(quote "$2")
+
+    echo "-netdev tap,helper=${BRIDGE_HELPER},br=${BRIDGE},id=netdev${NETDEV_ID}"
+    echo "-device virtio-net,netdev=netdev${NETDEV_ID}"
+}
+
+# hdd <FILE> <SIZE>
+function hdd() {
+    local FILE=$(quote "$1")
+    local SIZE="$2"
+
+    if [ ! -e $FILE ]; then
+        qemu-img create -q -f qcow2 $FILE "$SIZE"
+    else
+        qemu-img resize -q $FILE "$SIZE"
+    fi
+
+    __append_boot_device c
+    echo "-drive file=${FILE},cache=none,if=virtio"
+}
+
+# cdrom <FILE>
+function cdrom() {
+    local FILE=$(quote "$1")
+
+    __append_boot_device d
+    echo "-cdrom ${FILE}"
+}
+
+# mem <SIZE>
+function mem() {
+    local SIZE=$(quote "$1")
+
+    echo "-m ${SIZE}"
+}
+
+CONFIG_FILE="$1"
+CONFIG_DIRNAME=$(dirname "${CONFIG_FILE}")
+CONFIG_BASENAME=$(basename "${CONFIG_FILE}")
+
+USER=$(quote $(stat -c '%U' "${CONFIG_FILE}"))
+
+echo "-runas ${USER}"
+echo "-monitor unix:monitor.sock,server,nowait"
+echo "-enable-kvm -vga std -nographic -vnc none"
+
+cd "${CONFIG_DIRNAME}"
+source "$CONFIG_BASENAME"

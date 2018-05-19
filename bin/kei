@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -Cue
+
+SUBCOMMAND="kei-$1"
+shift
+if ! which "${SUBCOMMAND}" > /dev/null; then
+    echo "kei: '${1}' is not a kei command."
+    exit 1
+fi
+
+"${SUBCOMMAND}" "$@"

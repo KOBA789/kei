@@ -1,0 +1,28 @@
+#!/bin/bash
+
+set -Cue
+
+INIT_DIR="$1"
+
+mkdir -p "${INIT_DIR}"
+
+cd "${INIT_DIR}"
+
+if [ ! -z $(ls) ]; then
+    echo "Target directory is not empty" >&2
+    exit 1
+fi
+
+mkdir -p disks
+
+cat > config <<EOF
+mem 1024
+#nic 0 br0
+hdd "disks/001.img" 20G
+#cdrom "installer.iso"
+#pxe
+boot
+EOF
+cdrom ".iso"
+boot
+EOF
